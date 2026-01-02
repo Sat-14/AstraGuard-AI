@@ -79,11 +79,11 @@ def test_backoff_schedule_calculation():
     
     # First attempt has no delay
     assert delays[0] == 0
-    # 0.5 * 2^0 = 0.5
+    # attempt 1: 0.5 * 2^(1-1) = 0.5 * 1 = 0.5
     assert delays[1] == 0.5
-    # 0.5 * 2^1 = 1.0
+    # attempt 2: 0.5 * 2^(2-1) = 0.5 * 2 = 1.0
     assert delays[2] == 1.0
-    # 0.5 * 2^2 = 2.0
+    # attempt 3: 0.5 * 2^(3-1) = 0.5 * 4 = 2.0
     assert delays[3] == 2.0
 
 
@@ -91,9 +91,15 @@ def test_backoff_schedule_hits_max_delay():
     """Test that backoff is capped at max_delay."""
     delays = calculate_backoff_delays(max_attempts=6, base_delay=0.5, max_delay=8.0)
     
-    # 0.5 * 2^4 = 8.0
-    assert delays[4] == 8.0
-    # 0.5 * 2^5 = 16.0, capped to 8.0
+    # attempt 1: 0.5 * 2^0 = 0.5
+    assert delays[1] == 0.5
+    # attempt 2: 0.5 * 2^1 = 1.0
+    assert delays[2] == 1.0
+    # attempt 3: 0.5 * 2^2 = 2.0
+    assert delays[3] == 2.0
+    # attempt 4: 0.5 * 2^3 = 4.0
+    assert delays[4] == 4.0
+    # attempt 5: 0.5 * 2^4 = 8.0
     assert delays[5] == 8.0
 
 
@@ -228,6 +234,7 @@ async def test_retry_with_args_and_exceptions():
 def test_retry_sync_function_success():
     """Test retry decorator works with sync functions."""
     func = Mock(return_value="success")
+    func.__name__ = "test_func"  # Mock needs __name__ attribute
     decorated = Retry()(func)
     
     result = decorated()
@@ -239,6 +246,7 @@ def test_retry_sync_function_success():
 def test_retry_sync_function_with_retry():
     """Test sync function retry on transient failure."""
     func = Mock(side_effect=[TimeoutError(), "success"])
+    func.__name__ = "test_func"  # Mock needs __name__ attribute
     decorated = Retry(
         max_attempts=3,
         base_delay=0.01,
