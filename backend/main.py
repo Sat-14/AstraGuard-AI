@@ -78,7 +78,7 @@ async def lifespan(app: FastAPI):
     # ========== STARTUP ==========
     logger.info("🚀 AstraGuard AI Backend starting...")
 
-    global health_monitor, fallback_manager, component_health, redis_client, distributed_coordinator
+    global health_monitor, fallback_manager, component_health, redis_client, distributed_coordinator, recovery_orchestrator
 
     try:
         # Initialize component health monitor

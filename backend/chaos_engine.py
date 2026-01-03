@@ -311,17 +311,20 @@ class ChaosEngine:
                 if resp.status == 200:
                     status_data = await resp.json()
                     
+                    # Handle error response (recovery_orchestrator not initialized)
+                    if "error" in status_data:
+                        logger.warning(f"Recovery orchestrator error: {status_data.get('error')}")
+                        return False
+                    
                     # Check if orchestrator is running (ready to handle failures)
-                    is_running = status_data.get("status") == "running"
+                    status = status_data.get("status")
+                    is_running = status == "running"
                     
-                    # In live environment, would check: 
-                    # - action_count > 0 (actions executed)
-                    # - But in CI/dry-run, recovery depends on actual health degradation
-                    # - Just verify orchestrator is operational
-                    
-                    logger.info(f"Recovery orchestrator status: {status_data.get('status')}")
+                    logger.info(f"Recovery orchestrator status: {status}")
                     
                     # Success: Orchestrator running and operational
+                    # In live environment with actual failures, would also check:
+                    # - metrics.get('total_actions_executed', 0) > 0
                     return is_running
 
             return result
