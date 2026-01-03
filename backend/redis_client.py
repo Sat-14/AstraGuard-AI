@@ -198,8 +198,10 @@ class RedisClient:
 
         try:
             key = f"astra:resilience:vote:{instance_id}"
-            vote["timestamp"] = datetime.utcnow().isoformat()
-            await self.redis.set(key, json.dumps(vote), ex=ttl)
+            # Create shallow copy to avoid mutating caller's dict
+            vote_copy = dict(vote)
+            vote_copy["timestamp"] = datetime.utcnow().isoformat()
+            await self.redis.set(key, json.dumps(vote_copy), ex=ttl)
             logger.debug(f"Registered vote from {instance_id}")
             return True
         except Exception as e:
@@ -301,8 +303,10 @@ class RedisClient:
 
         try:
             key = f"astra:health:{instance_id}"
-            health["timestamp"] = datetime.utcnow().isoformat()
-            await self.redis.set(key, json.dumps(health), ex=ttl)
+            # Create shallow copy to avoid mutating caller's dict
+            health_copy = dict(health)
+            health_copy["timestamp"] = datetime.utcnow().isoformat()
+            await self.redis.set(key, json.dumps(health_copy), ex=ttl)
             logger.debug(f"Published health for {instance_id}")
             return True
         except Exception as e:
