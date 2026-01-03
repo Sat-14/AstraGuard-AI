@@ -43,7 +43,7 @@ rm -rf ~/.cache/pip/*
 
 ## Migration Steps
 
-### Step 1: Replace Workflow Files
+### Step 1: Update Workflow Files
 
 1. **Backup current workflows:**
    ```bash
@@ -51,14 +51,18 @@ rm -rf ~/.cache/pip/*
    cp .github/workflows/ci-cd.yml .github/workflows/ci-cd.yml.bak
    ```
 
-2. **Use optimized workflows:**
-   ```bash
-   # Option A: Replace completely (RECOMMENDED for fresh start)
-   cp .github/workflows/tests-optimized.yml .github/workflows/tests.yml
-   cp .github/workflows/ci-cd-optimized.yml .github/workflows/ci-cd.yml
+2. **Apply optimizations to existing workflows:**
    
-   # Option B: Manual migration (see detailed sections below)
-   ```
+   **Option A: Use current optimized versions (RECOMMENDED)**
+   - The current `.github/workflows/tests.yml` and `.github/workflows/ci-cd.yml` already include:
+     - CPU-only PyTorch installation (`--extra-index-url https://download.pytorch.org/whl/cpu`)
+     - Minimal dependency caching
+     - Disk cleanup steps
+     - Optimized job matrix configuration
+   - No action needed - workflows are pre-optimized
+   
+   **Option B: Manual migration for custom setups**
+   - See detailed sections below for specific optimizations to apply
 
 ### Step 2: Update Dependency Files
 
